@@ -1,60 +1,68 @@
+
 $(document).ready(function () {
     $.getJSON('./balance_sheet_data.json', function (data) {
-        var parentData = data.filter(function (item) {
-            return item.parent === "";
+      var parentData = data.filter(function (item) {
+        return item.parent === "";
+      });
+      var balanceSheet = $('#balance-sheet');
+  
+      parentData.forEach(function (parentItem) {
+        var parentElement = $('<div>').addClass('parent').appendTo(balanceSheet);
+        $('<p>').text(parentItem.particulars).appendTo(parentElement);
+  
+        var childData = data.filter(function (childItem) {
+          return childItem.parent === parentItem.particulars;
         });
-        var tbody = $('#balance-sheet tbody');
-
-        parentData.forEach(function (parentItem) {
-            var parentRow = $('<tr>').addClass('parent').appendTo(tbody);
-            $('<td>').text(parentItem.particulars).appendTo(parentRow);
-            $('<td>').text(parentItem.cr).appendTo(parentRow);
-            $('<td>').append($('<span>').addClass('toggle-sign').text('+')).appendTo(parentRow);
-
-            var childData = data.filter(function (childItem) {
-                return childItem.parent === parentItem.particulars;
+  
+        if (childData.length > 0) {
+          var childList = $('<ul>').addClass('child').appendTo(parentElement);
+  
+          childData.forEach(function (childItem) {
+            var childElement = $('<li>').text(childItem.particulars).appendTo(childList);
+  
+            var subChildData = data.filter(function (subChildItem) {
+              return subChildItem.parent === childItem.particulars;
             });
-
-            if (childData.length > 0) {
-                var childContainer = $('<tbody>').addClass('child').appendTo(parentRow);
-                childData.forEach(function (childItem) {
-                    var childRow = $('<tr> ').appendTo(childContainer);
-                    $('<td>').text(childItem.particulars).appendTo(childRow);
-                    $('<td>').text(childItem.cr).appendTo(childRow);
-
-                    var subChildData = data.filter(function (subChildItem) {
-                        return subChildItem.parent === childItem.particulars;
-                    });
-
-                    if (subChildData.length > 0) {
-                        childRow.addClass('has-child');
-                        $('<td>').addClass('toggle-sign').text('+').appendTo(childRow);
-                        var subChildContainer = $('<tbody>').addClass('sub-child').appendTo(childRow);
-                        subChildData.forEach(function (subChildItem) {
-                            var subChildRow = $('<tr>').appendTo(subChildContainer);
-                            $('<td>').text(subChildItem.particulars).appendTo(subChildRow);
-                            $('<td>').text(subChildItem.cr).appendTo(subChildRow);
-                        });
-                    }
-                });
+  
+            if (subChildData.length > 0) {
+              var subChildList = $('<ul>').addClass('sub-child').appendTo(childElement);
+  
+              subChildData.forEach(function (subChildItem) {
+                $('<li>').text(subChildItem.particulars).appendTo(subChildList);
+              });
             }
+  
+            if (subChildData.length > 0) {
+              childElement.addClass('has-child');
+              $('<span>').addClass('toggle-sign').text('+').appendTo(childElement);
+            }
+          });
+        }
+  
+        if (childData.length > 0) {
+          parentElement.addClass('has-child');
+          $('<span>').addClass('toggle-sign').text('+').appendTo(parentElement);
+        }
+      });
+  
+      $('#balance-sheet').on('click', '.parent', function (event) {
+        if (!$(event.target).is('.toggle-sign')) {
+          $(this).toggleClass('open');
+          $(this).children('.child').slideToggle();
+          $(this).find('.toggle-sign').text(function () {
+            return $(this).text() === '+' ? '-' : '+';
+          });
+        }
+      });
+  
+      $('#balance-sheet').on('click', '.has-child .toggle-sign', function (event) {
+        event.stopPropagation();
+        $(this).toggleClass('open');
+        $(this).siblings('.sub-child').slideToggle();
+        $(this).text(function () {
+          return $(this).text() === '+' ? '-' : '+';
         });
-
-        $('#balance-sheet').on('click', '.parent', function () {
-            $(this).toggleClass('open');
-            $(this).find('.child').toggleClass('open');
-            $(this).find('.toggle-sign').text(function () {
-                return $(this).text() === '+' ? '-' : '+';
-            });
-        });
-
-        $('#balance-sheet').on('click', '.has-child .toggle-sign', function (event) {
-            event.preventDefault();
-            $(this).toggleClass('open');
-            $(this).closest('.has-child').find('.sub-child').toggleClass('open');
-            $(this).text(function () {
-                return $(this).text() === '+' ? '-' : '+';
-            });
-        });
+      });
     });
-});
+  });
+  

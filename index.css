@@ -1,65 +1,30 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background-color: antiquewhite;
-}
-
-.parent .toggle-sign {
-    float: left;
-    margin-right: 5px;
-    transition: transform 0.2s ease-in-out;
-    position: static;
-}
-
-.child {
+.parent {
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  .child,
+  .sub-child {
     display: none;
-    padding-left: 20px;
-}
-
-.child.open {
-    display: table-row-group;
-    margin-top: 10px;
-}
-
-#balance-sheet thead tr th:first-child {
-    text-align: left;
-}
-
-#balance-sheet thead tr th:last-child {
-    text-align: right;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-
-th,
-td {
-    text-align: left;
-    padding: 8px;
-}
-
-
-td:first-child {
-    border-left: none;
-}
-
-td:last-child {
-    border-right: none;
-}
-
-td:not(:first-child):not(:last-child) {
-    border-left: none;
-    border-right: none;
-}
-
-.compdata {
-    color: aquamarine;
-    font-size: 1.3rem;
-}
+    margin-left: 20px;
+  }
+  
+  .open .child,
+  .open .sub-child {
+    display: block;
+  }
+  
+  .has-child .toggle-sign:before {
+    content: '+';
+    display: inline-block;
+    margin-right: 5px;
+  }
+  
+  .has-child.open .toggle-sign:before {
+    content: '-';
+  }
+  
+  .sub-child {
+    margin-left: 40px;
+  }
+  
